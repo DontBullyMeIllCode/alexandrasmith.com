@@ -22,8 +22,8 @@ export default function StarParticles() {
   const radius = 10000;
 
   const points = useRef<THREE.Points | null>(null);
-  const simulationMaterialRef = useRef<THREE.Material | null>(null);
-  const frequencyMaterialRef = useRef<THREE.Material | null>(null);
+  const simulationMaterialRef = useRef<SimulationMaterial | null>(null);
+  const frequencyMaterialRef = useRef<FrequencyMaterial | null>(null);
 
   const scene = useMemo(() => new THREE.Scene(), []);
   const frequencyScene = useMemo(() => new THREE.Scene(), []);
@@ -96,6 +96,16 @@ export default function StarParticles() {
     []
   );
 
+  const simulationMaterial = useMemo(
+    () => new SimulationMaterial(size, radius),
+    [size, radius]
+  );
+
+  const frequencyMaterial = useMemo(
+    () => new FrequencyMaterial(size),
+    [size]
+  );
+
   useEffect(() => {
     if (!canvasReady) {
       dispatch({ type: "canvasReady" });
@@ -104,6 +114,10 @@ export default function StarParticles() {
 
   useFrame((state) => {
     const { gl, clock } = state;
+
+    if (!points.current || !simulationMaterialRef.current || !frequencyMaterialRef.current || !audioAnalyser) {
+      return;
+    }
 
     gl.setRenderTarget(renderTarget);
     gl.clear();
@@ -115,14 +129,14 @@ export default function StarParticles() {
     gl.render(frequencyScene, camera);
     gl.setRenderTarget(null);
 
-    points.current!.material.uniforms.uPositions.value = renderTarget.texture;
-    points.current!.material.uniforms.uFrequencies.value =
-      frequencyRenderTarget.texture;
+    const pointsMaterial = points.current.material as THREE.ShaderMaterial;
+    pointsMaterial.uniforms.uPositions.value = renderTarget.texture;
+    pointsMaterial.uniforms.uFrequencies.value = frequencyRenderTarget.texture;
 
-    simulationMaterialRef.current!.uniforms.uTime.value = clock.elapsedTime;
+    simulationMaterialRef.current.uniforms.uTime.value = clock.elapsedTime;
     generateColorsTexture(
       size,
-      frequencyMaterialRef.current!.uniforms.frequency.value,
+      frequencyMaterialRef.current.uniforms.frequency.value,
       getFrequencyColorMapping(size, audioAnalyser.getFrequencyData())
     );
   });
@@ -131,22 +145,21 @@ export default function StarParticles() {
     <>
       {createPortal(
         <mesh>
-          <simulationMaterial
+          <primitive
+            object={simulationMaterial}
             ref={simulationMaterialRef}
-            args={[size, radius]}
+            attach="material"
           />
           <bufferGeometry drawRange={{ start: 0, count: size }}>
             <bufferAttribute
               attach="attributes-position"
+              args={[positions, 3]}
               count={positions.length / 3}
-              array={positions}
-              itemSize={3}
             />
             <bufferAttribute
               attach="attributes-uv"
+              args={[uvs, 2]}
               count={uvs.length / 2}
-              array={uvs}
-              itemSize={2}
             />
           </bufferGeometry>
         </mesh>,
@@ -154,19 +167,21 @@ export default function StarParticles() {
       )}
       {createPortal(
         <mesh>
-          <frequencyMaterial ref={frequencyMaterialRef} args={[size]} />
+          <primitive
+            object={frequencyMaterial}
+            ref={frequencyMaterialRef}
+            attach="material"
+          />
           <bufferGeometry drawRange={{ start: 0, count: size }}>
             <bufferAttribute
               attach="attributes-position"
+              args={[positions, 3]}
               count={positions.length / 3}
-              array={positions}
-              itemSize={3}
             />
             <bufferAttribute
               attach="attributes-uv"
+              args={[uvs, 2]}
               count={uvs.length / 2}
-              array={uvs}
-              itemSize={2}
             />
           </bufferGeometry>
         </mesh>,
@@ -176,9 +191,8 @@ export default function StarParticles() {
         <bufferGeometry drawRange={{ start: 0, count: size }}>
           <bufferAttribute
             attach="attributes-position"
+            args={[particlesPosition, 3]}
             count={particlesPosition.length / 3}
-            array={particlesPosition}
-            itemSize={3}
           />
         </bufferGeometry>
         <shaderMaterial

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { useThree } from "@react-three/fiber";
 import { useAppContext, useAppDispatch } from "@/context/AppContext";
 
@@ -14,7 +14,10 @@ export default function MusicVisualizer({
   const dispatch = useAppDispatch();
 
   useEffect(() => {
-    console.log(audioLoader);
+    if (!audioLoader || !audio || !listener) {
+      return;
+    }
+
     audioLoader.load("./Elektra-Moon-Light.mp3", (buffer) => {
       audio.setBuffer(buffer);
       audio.loop = true;
