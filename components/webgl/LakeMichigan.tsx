@@ -1,12 +1,12 @@
 import * as THREE from 'three'
-import React, { useRef, useMemo } from 'react'
-import { extend, useThree, useLoader, useFrame } from '@react-three/fiber'
-import { Water } from 'three-stdlib'
+import React, {useRef, useMemo} from 'react'
+import {extend, useThree, useLoader, useFrame} from '@react-three/fiber'
+import {Water} from 'three-stdlib'
 
-extend({ Water })
+extend({Water})
 
 export default function LakeMichigan() {
-  const ref = useRef()
+  const ref = useRef(null)
   const gl = useThree((state) => state.gl)
   const waterNormals = useLoader(THREE.TextureLoader, '/textures/water/waternormals.jpeg')
 
@@ -26,9 +26,9 @@ export default function LakeMichigan() {
       format: gl.encoding
     }),
     [waterNormals]
-  )
+  );
 
-  useFrame((state, delta) => (ref.current.material.uniforms.time.value += delta))
+  useFrame((state, delta) => (ref.current.material.uniforms.time.value += delta));
 
-  return <water ref={ref} args={[geom, config]} rotation-x={-Math.PI / 2} />
+  return <water ref={ref} args={[geom, config]} rotation-x={-Math.PI / 2}/>
 }
