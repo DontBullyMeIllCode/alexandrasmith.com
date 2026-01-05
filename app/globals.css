@@ -1,26 +1,87 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@theme {
+  /* Fonts */
+  --font-museo: "MuseoModerno Variable", system-ui;
+  --font-syne: "Syne Variable", sans-serif;
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
+  /* Colors */
+  --color-nse-pink-50: #fbe3f3;
+  --color-nse-pink-100: #f4b8e3;
+  --color-nse-pink-200: #f189cf;
+  --color-nse-pink-300: #f152ba;
+  --color-nse-pink-400: #f301a6;
+  --color-nse-pink-500: #f80090;
+  --color-nse-pink-600: #e5008c;
+  --color-nse-pink-700: #cd0084;
+  --color-nse-pink-800: #b70080;
+  --color-nse-pink-900: #8c0076;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+  --color-nse-blue-50: #e8eaf9;
+  --color-nse-blue-100: #c5caef;
+  --color-nse-blue-200: #9ea9e5;
+  --color-nse-blue-300: #7687db;
+  --color-nse-blue-400: #576bd3;
+  --color-nse-blue-500: #3551ca;
+  --color-nse-blue-600: #2f49bf;
+  --color-nse-blue-700: #243eb3;
+  --color-nse-blue-800: #1a34a8;
+  --color-nse-blue-900: #002094;
+
+  --color-nse-black: #200d3b;
+
+  --color-light-gold: #f5c58a;
+  --color-dark-gold: #8d6244;
+
+  /* Overrides */
+  --tracking-semiwide: 0.1em;
+  --tracking-wide: 0.25em;
+  --tracking-wider: 0.5em;
+  --tracking-widest: 1em;
+
+  /* Animations */
+  --animate-music-animation: music-animation 1.2s linear infinite;
+
+  @keyframes music-animation {
+    50% {
+      height: 20%;
+    }
+    100% {
+      height: 100%;
+    }
   }
 }
 
+@theme inline {
+  --font-bamq: var(--font-bamq);
+}
+
+html,
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+}
+
+main {
+  scroll-snap-type: y proximity;
+}
+
+section {
+  scroll-snap-align: center;
+}
+
+.title {
+  direction: rtl;
+}
+
+.subtitle {
+  direction: rtl;
+}
+
+.page-header {
+  h1,
+  p {
+    direction: rtl;
+  }
 }
